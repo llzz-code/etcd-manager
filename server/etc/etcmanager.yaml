@@ -1,0 +1,14 @@
+Name: etcd-manager
+Host: 0.0.0.0
+Port: 8888
+Mode: dev
+Timeout: 0
+
+Log:
+  ServiceName: etcd-manager
+  Level: info
+
+# Custom config
+DataPath: ./data
+CorsOrigins:
+  - "*"

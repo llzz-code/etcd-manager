@@ -1,0 +1,75 @@
+type (
+  // Connection management
+  Connection {
+    id        string   // unique id
+    name      string   // display name
+    endpoints []string // etcd endpoints, e.g. http://127.0.0.1:2379
+    username  string   // optional
+    password  string   // optional
+    status    string   // connected, disconnected, error
+  }
+
+  AddConnectionReq {
+    name      string   json:"name"
+    endpoints []string json:"endpoints"
+    username  string   json:"username,optional"
+    password  string   json:"password,optional"
+  }
+
+  UpdateConnectionReq {
+    id        string   json:"id"
+    name      string   json:"name,optional"
+    endpoints []string json:"endpoints,optional"
+    username  string   json:"username,optional"
+    password  string   json:"password,optional"
+  }
+
+  // KV operations
+  KeyItem {
+    key    string   // full key
+    value  string   // raw value
+    isDir  bool     // true if this is a directory (prefix)
+    ttl    int64    // ttl if any
+  }
+
+  ListKeysResp {
+    prefix   string
+    children []KeyItem // keys/directories directly under prefix (tree-friendly)
+  }
+
+  GetKeyReq {
+    key string json:"key" // full key
+  }
+
+  PutKeyReq {
+    key   string json:"key" // full key
+    value string json:"value" // raw value
+    ttl   int64  json:"ttl,optional"
+  }
+
+  CreateKeyReq {
+    key   string json:"key" // full key
+    value string json:"value" // raw value
+    ttl   int64  json:"ttl,optional"
+  }
+)
+
+service EtcdManagerApi {
+  // connection management
+  @server(
+    prefix: /api
+  )
+  get /connections returns ([]Connection)
+  post /connections(AddConnectionReq) returns (Connection)
+  put /connections(UpdateConnectionReq) returns (Connection)
+  delete /connections/:id returns ()
+  post /connections/:id/connect returns (Connection)
+  post /connections/:id/disconnect returns (Connection)
+
+  // kv operations
+  get /kv/list(prefix) returns (ListKeysResp)
+  get /kv(GetKeyReq) returns (KeyItem)
+  put /kv(PutKeyReq) returns ()
+  post /kv(CreateKeyReq) returns (KeyItem)
+  delete /kv/:key returns ()
+}
