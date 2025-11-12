@@ -157,9 +157,22 @@ func putKey(ctx *svc.ServiceContext) http.HandlerFunc {
             httpx.Error(w, err)
             return
         }
+
+        // Validate key format
+        if err := validateKey(req.Key); err != nil {
+            BadRequest(w, err.Error())
+            return
+        }
+
+        // Validate value size
+        if err := validateValue(req.Value); err != nil {
+            BadRequest(w, err.Error())
+            return
+        }
+
         cli, ok := ctx.Manager.Client(req.ConnID)
         if !ok {
-            httpx.WriteJson(w, http.StatusBadRequest, map[string]string{"message": "invalid connId or not connected"})
+            BadRequest(w, "invalid connId or not connected")
             return
         }
         // handle TTL by lease
@@ -167,14 +180,14 @@ func putKey(ctx *svc.ServiceContext) http.HandlerFunc {
         if req.TTL > 0 {
             lr, err := cli.Grant(r.Context(), req.TTL)
             if err != nil {
-                httpx.Error(w, err)
+                InternalError(w, err)
                 return
             }
             opts = append(opts, clientv3.WithLease(lr.ID))
         }
         _, err := cli.Put(r.Context(), req.Key, req.Value, opts...)
         if err != nil {
-            httpx.Error(w, err)
+            InternalError(w, err)
             return
         }
         httpx.Ok(w)
@@ -190,14 +203,25 @@ func deleteKey(ctx *svc.ServiceContext) http.HandlerFunc {
         // Use query param to allow keys with '/'
         key := r.URL.Query().Get("key")
         connID := r.URL.Query().Get("connId")
+
+        // Validate key format
+        if key == "" {
+            BadRequest(w, "key parameter is required")
+            return
+        }
+        if err := validateKey(key); err != nil {
+            BadRequest(w, err.Error())
+            return
+        }
+
         cli, ok := ctx.Manager.Client(connID)
         if !ok {
-            httpx.WriteJson(w, http.StatusBadRequest, map[string]string{"message": "invalid connId or not connected"})
+            BadRequest(w, "invalid connId or not connected")
             return
         }
         _, err := cli.Delete(r.Context(), key)
         if err != nil {
-            httpx.Error(w, err)
+            InternalError(w, err)
             return
         }
         httpx.Ok(w)

@@ -36,9 +36,28 @@ func addConnection(ctx *svc.ServiceContext) http.HandlerFunc {
             httpx.Error(w, err)
             return
         }
+
+        // Validate connection name
+        if err := validateConnectionName(req.Name); err != nil {
+            BadRequest(w, err.Error())
+            return
+        }
+
+        // Validate endpoints
+        if len(req.Endpoints) == 0 {
+            BadRequest(w, "at least one endpoint is required")
+            return
+        }
+        for _, endpoint := range req.Endpoints {
+            if err := validateEndpoint(endpoint); err != nil {
+                BadRequest(w, err.Error())
+                return
+            }
+        }
+
         conn, err := ctx.Store.Add(req.Name, req.Endpoints, req.Username, req.Password)
         if err != nil {
-            httpx.Error(w, err)
+            InternalError(w, err)
             return
         }
         httpx.OkJson(w, conn)
@@ -52,9 +71,28 @@ func updateConnection(ctx *svc.ServiceContext) http.HandlerFunc {
             httpx.Error(w, err)
             return
         }
+
+        // Validate connection name if provided
+        if req.Name != "" {
+            if err := validateConnectionName(req.Name); err != nil {
+                BadRequest(w, err.Error())
+                return
+            }
+        }
+
+        // Validate endpoints if provided
+        if len(req.Endpoints) > 0 {
+            for _, endpoint := range req.Endpoints {
+                if err := validateEndpoint(endpoint); err != nil {
+                    BadRequest(w, err.Error())
+                    return
+                }
+            }
+        }
+
         conn, err := ctx.Store.Update(req.ID, req.Name, req.Endpoints, req.Username, req.Password)
         if err != nil {
-            httpx.Error(w, err)
+            InternalError(w, err)
             return
         }
         httpx.OkJson(w, conn)

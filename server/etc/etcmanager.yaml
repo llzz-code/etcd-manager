@@ -1,14 +1,21 @@
 Name: etcd-manager
 Host: 0.0.0.0
 Port: 8888
-Mode: dev
+Mode: pro
 Timeout: 0
 
 Log:
   ServiceName: etcd-manager
   Level: info
+  Mode: console
 
 # Custom config
-DataPath: ./data
+DataPath: /app/data
+
+# Secret key for password encryption (base64-encoded, 32 bytes for AES-256)
+# If not set, will use ETCD_MANAGER_SECRET_KEY env var or auto-generate
+# IMPORTANT: Save the generated key to preserve access to encrypted passwords
+SecretKey: ""
+
 CorsOrigins:
   - "*"

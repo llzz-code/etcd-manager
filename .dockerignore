@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules
+server/vendor
+
+# Build artifacts
+web/react-app/dist
+server/bin
+server/api
+*.exe
+
+# Data
+data/
+*.log
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage.out
+*.test
+
+# Temp
+*.tmp
+server/tmp/
+
+# OpenSpec
+openspec/changes/*/specs/*
+.claude/
+.ai-rules/

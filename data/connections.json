@@ -1,11 +1,11 @@
 [
   {
-    "id": "f3da1d63-017b-4b7a-ad63-53975c4e76aa",
-    "name": "test",
+    "id": "d377feeb-d119-41fb-bf40-db5a2f0f3901",
+    "name": "etcd-tencent",
     "endpoints": [
-      "10.108.100.12:2379"
+      "http://10.108.100.12:2379"
     ],
     "status": "connected",
-    "updatedAt": 1762931537
+    "updatedAt": 1762946795
   }
 ]
