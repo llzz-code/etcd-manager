@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Tree, Spin, Input, Space, Empty } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { kvApi } from '@/api';
@@ -15,15 +15,7 @@ export const TreePanel: React.FC = () => {
   const loadKey = useEditorStore((s) => s.loadKey);
   const currentKey = useEditorStore((s) => s.currentKey);
 
-  useEffect(() => {
-    if (currentConnectionId) {
-      loadRootLevel();
-    } else {
-      setTreeData([]);
-    }
-  }, [currentConnectionId]);
-
-  const loadRootLevel = async () => {
+  const loadRootLevel = useCallback(async () => {
     if (!currentConnectionId) return;
 
     setLoading(true);
@@ -36,7 +28,15 @@ export const TreePanel: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentConnectionId]);
+
+  useEffect(() => {
+    if (currentConnectionId) {
+      loadRootLevel();
+    } else {
+      setTreeData([]);
+    }
+  }, [currentConnectionId, loadRootLevel]);
 
   const buildTreeNodes = (items: KeyItem[]): DataNode[] => {
     return items.map((item) => ({

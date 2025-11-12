@@ -37,7 +37,6 @@ RUN mkdir -p /app/data && \
 USER etcdmgr
 
 EXPOSE 8888
-EXPOSE 5173
 VOLUME /app/data
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

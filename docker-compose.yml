@@ -29,7 +29,6 @@ services:
     container_name: etcd-manager
     ports:
       - "8888:8888"
-      - "5173:5173"
     volumes:
       - ./data:/app/data
     environment:

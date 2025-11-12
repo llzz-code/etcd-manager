@@ -34,10 +34,10 @@ func RegisterHandlers(server *rest.Server, ctx *svc.ServiceContext) {
     server.AddRoute(rest.Route{Method: http.MethodDelete, Path: "/api/kv", Handler: deleteKey(ctx)})
     server.AddRoute(rest.Route{Method: http.MethodPost, Path: "/api/kv/rename", Handler: renameKey(ctx)})
 
-    // Static files (frontend)
+    // Static files (frontend) - Must be last to act as catch-all
     server.AddRoute(rest.Route{
         Method:  http.MethodGet,
         Path:    "/",
-        Handler: http.FileServer(http.Dir("static")).ServeHTTP,
+        Handler: SPAHandler("static"),
     })
 }
