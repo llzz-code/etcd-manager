@@ -23,9 +23,7 @@ services:
       retries: 3
 
   etcd-manager:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: hapope/etcd-manager:latest
     container_name: etcd-manager
     ports:
       - "8888:8888"
