@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { kvApi } from '@/api';
 import { message } from 'antd';
+import type { KeyRevision } from '@/types/kv';
 
 type ContentFormat = 'json' | 'yaml' | 'text';
 
@@ -12,12 +13,15 @@ interface EditorState {
   format: ContentFormat;
   ttl: number;
   loading: boolean;
+  history: KeyRevision[];
 
   loadKey: (connId: string, key: string) => Promise<void>;
   setContent: (content: string) => void;
   setFormat: (format: ContentFormat) => void;
   saveKey: (connId: string) => Promise<void>;
   deleteKey: (connId: string, key: string) => Promise<void>;
+  loadHistory: (connId: string, key: string) => Promise<void>;
+  rollbackToRevision: (connId: string, key: string, revision: number) => Promise<void>;
   reset: () => void;
 }
 
@@ -44,6 +48,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   format: 'text',
   ttl: 0,
   loading: false,
+  history: [],
 
   loadKey: async (connId: string, key: string) => {
     const state = get();
@@ -136,6 +141,34 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }
   },
 
+  loadHistory: async (connId: string, key: string) => {
+    set({ loading: true });
+    try {
+      const data = await kvApi.getHistory(connId, key, 20);
+      set({ history: data.history, loading: false });
+    } catch (error) {
+      set({ loading: false });
+      message.error('Failed to load history');
+      console.error('Failed to load history:', error);
+      throw error;
+    }
+  },
+
+  rollbackToRevision: async (connId: string, key: string, revision: number) => {
+    set({ loading: true });
+    try {
+      await kvApi.rollback({ connId, key, revision });
+      await get().loadKey(connId, key);
+      await get().loadHistory(connId, key);
+      message.success('Successfully rolled back');
+    } catch (error) {
+      set({ loading: false });
+      message.error('Rollback failed');
+      console.error('Rollback failed:', error);
+      throw error;
+    }
+  },
+
   reset: () => {
     set({
       currentKey: null,
@@ -145,6 +178,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       format: 'text',
       ttl: 0,
       loading: false,
+      history: [],
     });
   },
 }));

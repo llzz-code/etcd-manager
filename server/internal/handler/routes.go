@@ -33,6 +33,10 @@ func RegisterHandlers(server *rest.Server, ctx *svc.ServiceContext) {
     // Use query param for key to support keys containing '/'
     server.AddRoute(rest.Route{Method: http.MethodDelete, Path: "/api/kv", Handler: deleteKey(ctx)})
     server.AddRoute(rest.Route{Method: http.MethodPost, Path: "/api/kv/rename", Handler: renameKey(ctx)})
+    server.AddRoute(rest.Route{Method: http.MethodPost, Path: "/api/kv/copy", Handler: copyKey(ctx)})
+    server.AddRoute(rest.Route{Method: http.MethodPost, Path: "/api/kv/batch-delete", Handler: batchDeleteKeys(ctx)})
+    server.AddRoute(rest.Route{Method: http.MethodGet, Path: "/api/kv/history", Handler: getKeyHistory(ctx)})
+    server.AddRoute(rest.Route{Method: http.MethodPost, Path: "/api/kv/rollback", Handler: rollbackKey(ctx)})
 
     // Static files (frontend) - Must be last to act as catch-all
     server.AddRoute(rest.Route{

@@ -27,3 +27,42 @@ export interface ListKeysReq {
   prefix: string;
   includeTTL?: boolean;
 }
+
+export interface RenameKeyReq {
+  connId: string;
+  from: string;
+  to: string;
+  overwrite?: boolean;
+}
+
+export interface CopyKeyReq {
+  connId: string;
+  from: string;
+  to: string;
+  overwrite?: boolean;
+}
+
+export interface BatchDeleteReq {
+  connId: string;
+  keys: string[];
+}
+
+export interface KeyRevision {
+  revision: number;
+  value: string;
+  modRevision: number;
+  createTime: number;
+  version: number;
+}
+
+export interface GetHistoryResp {
+  key: string;
+  history: KeyRevision[];
+  note: string;
+}
+
+export interface RollbackReq {
+  connId: string;
+  key: string;
+  revision: number;
+}
