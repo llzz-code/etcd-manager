@@ -307,11 +307,37 @@ func deleteKey(ctx *svc.ServiceContext) http.HandlerFunc {
             BadRequest(w, "invalid connId or not connected")
             return
         }
-        _, err := cli.Delete(r.Context(), key)
+
+        // Check if the key is a directory (has children) by checking if there are keys with this prefix
+        // Ensure the key ends with '/' for proper prefix matching
+        checkPrefix := key
+        if !strings.HasSuffix(checkPrefix, "/") {
+            checkPrefix += "/"
+        }
+
+        // Check if there are any children
+        resp, err := cli.Get(r.Context(), checkPrefix, clientv3.WithPrefix(), clientv3.WithCountOnly())
         if err != nil {
             InternalError(w, err)
             return
         }
+
+        // If there are children (count > 0), delete with prefix to remove all descendants
+        if resp.Count > 0 {
+            _, err = cli.Delete(r.Context(), checkPrefix, clientv3.WithPrefix())
+            if err != nil {
+                InternalError(w, err)
+                return
+            }
+        }
+
+        // Also delete the exact key itself (in case it's a leaf node or a directory that stores data)
+        _, err = cli.Delete(r.Context(), key)
+        if err != nil {
+            InternalError(w, err)
+            return
+        }
+
         httpx.Ok(w)
     }
 }
