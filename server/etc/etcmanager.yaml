@@ -15,7 +15,7 @@ DataPath: /app/data
 # Secret key for password encryption (base64-encoded, 32 bytes for AES-256)
 # If not set, will use ETCD_MANAGER_SECRET_KEY env var or auto-generate
 # IMPORTANT: Save the generated key to preserve access to encrypted passwords
-SecretKey: ""
+SecretKey: "8FXHQiFYNgqHOFBi7soJuBFx0uHxQvgMvCZVL1/qC64="
 
 CorsOrigins:
   - "*"

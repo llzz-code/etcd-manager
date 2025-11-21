@@ -13,7 +13,7 @@ export const connectionsApi = {
   },
 
   async update(data: UpdateConnectionReq): Promise<Connection> {
-    const response = await apiClient.post('/connections', data);
+    const response = await apiClient.put('/connections', data);
     return response.data;
   },
 
