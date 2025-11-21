@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { List, Button, Popconfirm, Typography, Spin, Empty, Tag, Card } from 'antd';
-import { HistoryOutlined, RollbackOutlined } from '@ant-design/icons';
+import { HistoryOutlined, RollbackOutlined, CloseOutlined } from '@ant-design/icons';
 import { useEditorStore } from '@/store/editorStore';
 import { useConnectionStore } from '@/store/connectionStore';
 import type { KeyRevision } from '@/types/kv';
 
 const { Text, Paragraph } = Typography;
 
-export const VersionHistoryPanel: React.FC = () => {
+interface VersionHistoryPanelProps {
+  onClose?: () => void;
+}
+
+export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({ onClose }) => {
   const {
     currentKey,
     history,
@@ -74,11 +78,23 @@ export const VersionHistoryPanel: React.FC = () => {
           padding: '12px 16px',
           borderBottom: '1px solid #d9d9d9',
           background: '#fff',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <Text strong>
           <HistoryOutlined /> Version History
         </Text>
+        {onClose && (
+          <Button
+            type="text"
+            size="small"
+            icon={<CloseOutlined />}
+            onClick={onClose}
+            style={{ marginLeft: 8 }}
+          />
+        )}
       </div>
 
       <Spin spinning={loading}>

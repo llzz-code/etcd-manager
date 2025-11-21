@@ -167,7 +167,9 @@ export const EditorPanel: React.FC = () => {
         </Spin>
       </div>
 
-      {historyPanelVisible && <VersionHistoryPanel />}
+      {historyPanelVisible && (
+        <VersionHistoryPanel onClose={() => setHistoryPanelVisible(false)} />
+      )}
     </div>
   );
 };

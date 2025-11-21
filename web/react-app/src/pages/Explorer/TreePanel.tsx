@@ -26,6 +26,7 @@ export const TreePanel: React.FC = () => {
   const [batchMode, setBatchMode] = useState(false);
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
   const [contextMenuNode, setContextMenuNode] = useState<DataNode | undefined>();
+  const [loadedKeys, setLoadedKeys] = useState<React.Key[]>([]);
 
   // Modals
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -46,6 +47,8 @@ export const TreePanel: React.FC = () => {
       const data = await kvApi.list(currentConnectionId, '/');
       const nodes = buildTreeNodes(data.children);
       setTreeData(nodes);
+      // Clear loaded keys to force Tree to reload all nodes
+      setLoadedKeys([]);
     } catch (error) {
       console.error('Failed to load root level:', error);
       message.error('Failed to load keys');
@@ -82,6 +85,7 @@ export const TreePanel: React.FC = () => {
     } catch (error) {
       console.error('Failed to load children:', error);
       message.error('Failed to load directory');
+      throw error; // Re-throw to let Tree component know the loading failed
     }
   };
 
@@ -327,6 +331,8 @@ export const TreePanel: React.FC = () => {
               <Tree
                 treeData={filteredData}
                 loadData={onLoadData}
+                loadedKeys={loadedKeys}
+                onLoad={(loadedKeys) => setLoadedKeys(loadedKeys as React.Key[])}
                 onSelect={onSelect}
                 selectedKeys={currentKey ? [currentKey] : []}
                 checkable={batchMode}
